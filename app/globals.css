@@ -1,0 +1,242 @@
+@import "tailwindcss";
+
+:root {
+  /* Paleta monocromática escura — cinzas herdados da landing do Vekon */
+  --canvas: #0a0a0a;
+  --canvas-deep: #141414;
+  --surface: #101010;
+  --surface-raised: #171717;
+  --ink: #f4f4f4;
+  --ink-soft: #b8b8b8;
+  --muted: #8a8a8a;
+  --accent: #ededed;
+  --accent-soft: #ffffff;
+  --accent-deep: #141414;
+  --line: rgba(255, 255, 255, 0.1);
+  --glow-top: rgba(255, 255, 255, 0.06);
+  --glow-bottom: rgba(255, 255, 255, 0.03);
+  --background: var(--canvas);
+  --foreground: var(--ink);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-canvas: var(--canvas);
+  --color-canvas-deep: var(--canvas-deep);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-deep: var(--accent-deep);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-line: var(--line);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-sora);
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--canvas);
+}
+
+/* Fundo cinza do Vekon: base sólida + dois halos radiais suaves */
+.atmosphere {
+  background:
+    radial-gradient(70% 55% at 50% 8%, var(--glow-top) 0%, transparent 60%),
+    radial-gradient(ellipse 90% 70% at 50% 100%, var(--glow-bottom) 0%, transparent 55%),
+    var(--canvas-deep);
+}
+
+.atmosphere-deep {
+  background:
+    radial-gradient(75% 60% at 50% 0%, var(--glow-top) 0%, transparent 62%),
+    radial-gradient(ellipse 90% 70% at 50% 100%, var(--glow-bottom) 0%, transparent 55%),
+    var(--canvas);
+}
+
+.atmosphere-grain::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.font-display {
+  font-family: var(--font-sora), system-ui, sans-serif;
+}
+
+/* Botões primários (ex.: Agende sua consulta) */
+.btn-primary {
+  background-color: var(--accent-soft);
+  color: var(--canvas);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease;
+}
+
+.btn-primary:hover {
+  background-color: #e2e2e2;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.65);
+}
+
+.btn-primary:active {
+  background-color: #cfcfcf;
+}
+
+.btn-ghost {
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background-color: rgba(255, 255, 255, 0.02);
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.btn-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+:where(a, button, input, textarea, summary):focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.55);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Marca circular animada (anéis orbitais + wordmark pontilhado)
+   --------------------------------------------------------------------------- */
+
+.circle-mark {
+  --ring-outer: rgba(255, 255, 255, 0.92);
+  --ring-inner: rgba(255, 255, 255, 0.42);
+  --ring-track: rgba(255, 255, 255, 0.22);
+  --ring-thin: rgba(255, 255, 255, 0.55);
+  --ring-divider: rgba(255, 255, 255, 0.1);
+}
+
+.circle-mark-ring-outer {
+  border: 5px solid var(--ring-outer);
+  box-shadow: inset 0 0 0 1px var(--ring-divider);
+  opacity: 0.92;
+}
+
+.circle-mark-ring-inner {
+  border: 2px solid var(--ring-inner);
+  box-shadow:
+    inset 0 0 0 1px var(--ring-divider),
+    0 0 80px rgba(255, 255, 255, 0.06);
+  opacity: 0.85;
+}
+
+.circle-mark-track {
+  stroke: var(--ring-track);
+}
+
+.circle-mark-thin {
+  stroke: var(--ring-thin);
+}
+
+.circle-mark-spin {
+  transform-origin: 50% 50%;
+  animation: circle-mark-spin 3.2s linear infinite;
+}
+
+.circle-mark-pulse {
+  animation: circle-mark-pulse 2.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.12));
+}
+
+.circle-mark-wobble {
+  transform-origin: 50% 50%;
+  animation: circle-mark-wobble 2.2s ease-in-out infinite;
+  opacity: 0.85;
+}
+
+@keyframes circle-mark-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes circle-mark-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    stroke-dasharray: 24 10;
+  }
+  50% {
+    opacity: 0.92;
+    stroke-dasharray: 28 8;
+  }
+}
+
+@keyframes circle-mark-wobble {
+  0%,
+  100% {
+    transform: rotate(-2deg) scale(1);
+  }
+  50% {
+    transform: rotate(2deg) scale(1.01);
+  }
+}
+
+.dotted-wordmark {
+  color: transparent;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.92) 1.4px, transparent 1.65px);
+  background-size: 5px 5px;
+  background-position: 0 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.28));
+  animation: dotted-wordmark-shimmer 6.2s ease-in-out infinite;
+}
+
+@keyframes dotted-wordmark-shimmer {
+  0%,
+  100% {
+    background-position: 0 0;
+    opacity: 0.94;
+  }
+  50% {
+    background-position: 14px 8px;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circle-mark-spin,
+  .circle-mark-pulse,
+  .circle-mark-wobble,
+  .dotted-wordmark {
+    animation: none;
+  }
+}

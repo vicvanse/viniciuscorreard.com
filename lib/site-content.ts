@@ -1,0 +1,398 @@
+import { getSafeWhatsAppUrl } from "@/lib/whatsapp-url";
+
+export interface NavItem {
+  href: string;
+  label: string;
+}
+
+export interface SituationItem {
+  title: string;
+  description: string;
+}
+
+export interface CareFact {
+  title: string;
+  description: string;
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+/** Layout do hero no desktop. Mobile permanece o círculo acima do nome. */
+export type HeroVariant = "1" | "2" | "3";
+
+export const HERO_VARIANTS: HeroVariant[] = ["1", "2", "3"];
+
+export interface SiteContent {
+  name: string;
+  fullName: string;
+  title: string;
+  crn: string;
+  phone: string;
+  email: string;
+  instagramUrl: string;
+  whatsappUrl: string;
+  whatsappLabel: string;
+  contactCtaLabel: string;
+  finalCtaLabel: string;
+  /** Foto do quadro Sobre mim. Vazio exibe a marca circular no lugar. */
+  portraitSrc: string;
+  portraitUpdatedAt: string;
+  /** Layout do hero no computador: 1 círculo centralizado, 2 empilhado, 3 lado a lado. */
+  heroVariant: HeroVariant;
+  nav: NavItem[];
+  hero: {
+    eyebrow: string;
+    headline: string;
+    support: string;
+    cta: string;
+    circleSubtitle: string;
+  };
+  situations: {
+    heading: string;
+    closing: string;
+    items: SituationItem[];
+  };
+  about: {
+    heading: string;
+    paragraphs: string[];
+  };
+  firstMeeting: {
+    heading: string;
+    paragraphs: string[];
+  };
+  care: {
+    heading: string;
+    paragraphs: string[];
+    facts: CareFact[];
+  };
+  faq: {
+    heading: string;
+    items: FaqItem[];
+  };
+  finalCta: {
+    heading: string;
+    support: string;
+  };
+  footer: {
+    copyright: string;
+  };
+  metadata: {
+    title: string;
+    description: string;
+  };
+}
+
+/** Campos que o admin pode editar (persistidos em JSON). */
+export type EditableContent = Omit<SiteContent, "nav" | "whatsappUrl"> & {
+  whatsappUrl: string;
+  nav: NavItem[];
+};
+
+export function createDefaultContent(): SiteContent {
+  const year = new Date().getFullYear();
+
+  return {
+    name: "Vinicius Correard",
+    fullName: "Vinicius Correard",
+    title: "Nutricionista",
+    crn: "CRN-10/14710P",
+    phone: "(12) 99777-6689",
+    email: "",
+    instagramUrl: "https://www.instagram.com/nutri.viniciuscorreard",
+    whatsappUrl: getSafeWhatsAppUrl(
+      process.env.NEXT_PUBLIC_WHATSAPP_URL || "https://wa.me/5512997776689",
+    ),
+    whatsappLabel: "Agende sua consulta",
+    contactCtaLabel: "Falar comigo no WhatsApp",
+    finalCtaLabel: "Agendar consulta pelo WhatsApp",
+    portraitSrc: "/brand/vinicius-portrait.webp",
+    portraitUpdatedAt: "",
+    heroVariant: "1",
+    nav: [
+      { href: "#inicio", label: "Início" },
+      { href: "#sobre", label: "Sobre mim" },
+      { href: "#atendimento", label: "Atendimento" },
+      { href: "#duvidas", label: "Dúvidas" },
+      { href: "#contato", label: "Contato" },
+    ],
+    hero: {
+      eyebrow: "Nutrição esportiva e clínica",
+      headline: "Nutrição que acompanha o seu ritmo",
+      support:
+        "Planos alimentares individualizados para performance, saúde e rotina real — sem dieta genérica e sem restrição desnecessária. Atendimento online e presencial.",
+      cta: "Agende sua consulta",
+      circleSubtitle: "Nutricionista",
+    },
+    situations: {
+      heading: "Talvez você esteja passando por isso",
+      closing:
+        "O acompanhamento nutricional traduz o seu objetivo em condutas práticas e sustentáveis, ajustadas ao longo do processo a partir de dados e da sua realidade.",
+      items: [
+        {
+          title: "Treina firme, mas o resultado não vem",
+          description:
+            "O treino está em dia e a disciplina existe, mas a composição corporal não muda e a energia oscila nas sessões mais pesadas. Na maioria das vezes o que falta não é esforço: é estratégia alimentar alinhada ao seu gasto e ao seu treino.",
+        },
+        {
+          title: "Não sabe o que comer no dia a dia",
+          description:
+            "Informação demais e orientação de menos. Dietas de internet, listas genéricas e regras contraditórias que não conversam com a sua rotina, o seu orçamento e aquilo que você realmente gosta de comer.",
+        },
+        {
+          title: "Já tentou várias dietas e desistiu",
+          description:
+            "Planos muito restritivos funcionam por algumas semanas e depois cobram o preço: fome constante, episódios de compulsão e a sensação de ter falhado. O ciclo recomeça sempre mais difícil do que antes.",
+        },
+        {
+          title: "Precisa ajustar a alimentação por saúde",
+          description:
+            "Exames alterados, colesterol, glicemia, intestino ou pressão pedindo atenção. A mudança alimentar é parte central do tratamento — e, bem conduzida, não precisa ser radical nem tomar conta da sua vida.",
+        },
+      ],
+    },
+    about: {
+      heading: "Um pouco sobre mim",
+      paragraphs: [
+        "Olá! Meu nome é Vinicius Correard e sou nutricionista, inscrito no CRN-10 sob o número 14710P, com atuação voltada à nutrição esportiva e ao acompanhamento clínico.",
+        "Atendo pessoas em momentos bem diferentes: de quem busca performance e recomposição corporal a quem precisa reorganizar a alimentação por questões de saúde, ou simplesmente quer comer melhor sem transformar isso em mais um problema na agenda.",
+        "Minha conduta parte de avaliação individual, evidência científica e ajustes progressivos. O objetivo não é entregar um plano perfeito no papel, e sim construir uma alimentação que você consiga sustentar depois que o acompanhamento terminar.",
+      ],
+    },
+    firstMeeting: {
+      heading: "Primeira consulta",
+      paragraphs: [
+        "A primeira consulta é uma avaliação completa, com cerca de 60 minutos. Conversamos sobre histórico de saúde, exames, rotina de treinos, sono, hábitos alimentares, preferências e o que já foi tentado antes.",
+        "Também realizo a avaliação antropométrica e, a partir de tudo isso, definimos juntos o plano alimentar e as metas do acompanhamento. Você termina a consulta sabendo exatamente qual é o próximo passo.",
+      ],
+    },
+    care: {
+      heading: "Como funciona o acompanhamento",
+      paragraphs: [
+        "O plano alimentar é individualizado e considera seu objetivo, sua rotina, seu orçamento e os alimentos que você gosta. Trabalho com substituições e faixas de porção para que o plano funcione tanto nos dias organizados quanto nos dias corridos.",
+        "Nos retornos revisamos o que funcionou, ajustamos o que não funcionou e acompanhamos a evolução por medidas, exames e desempenho nos treinos — não apenas pelo número da balança.",
+      ],
+      facts: [
+        {
+          title: "Avaliação individual",
+          description:
+            "Anamnese, exames, antropometria e histórico de treino guiam cada conduta.",
+        },
+        {
+          title: "Online e presencial",
+          description:
+            "Consultas por videochamada ou presenciais, com o mesmo plano e o mesmo suporte.",
+        },
+        {
+          title: "Acompanhamento contínuo",
+          description:
+            "Retornos periódicos e canal aberto para dúvidas entre uma consulta e outra.",
+        },
+      ],
+    },
+    faq: {
+      heading: "Perguntas frequentes",
+      items: [
+        {
+          question: "Você atende convênio ou plano de saúde?",
+          answer:
+            "Os atendimentos são particulares. Emito recibo e nota fiscal com o número do CRN para que você solicite o reembolso integral ou parcial junto ao seu plano, conforme as regras da sua apólice.",
+        },
+        {
+          question: "Como funciona o acompanhamento?",
+          answer:
+            "O primeiro contato é pelo WhatsApp, onde alinhamos horário e modalidade. Depois da avaliação inicial você recebe o plano alimentar e os materiais de apoio, e agendamos os retornos — em geral a cada 30 a 45 dias, conforme o objetivo.",
+        },
+        {
+          question: "O atendimento é online ou presencial?",
+          answer:
+            "Ambos. No formato online as consultas acontecem por videochamada e a avaliação corporal é feita de forma guiada ou a partir de dados que você já tenha. O plano, os materiais e o suporte são exatamente os mesmos.",
+        },
+        {
+          question: "Preciso cortar tudo o que gosto de comer?",
+          answer:
+            "Não. Planos que dependem de restrição total raramente duram. Trabalho com ajuste de quantidades, distribuição ao longo do dia e substituições, mantendo o que faz sentido para você dentro do objetivo combinado.",
+        },
+        {
+          question: "Você prescreve suplementos?",
+          answer:
+            "Quando há indicação. A suplementação entra como complemento depois que a alimentação está organizada, sempre dentro das atribuições do nutricionista e com base no seu objetivo, na sua rotina e nos seus exames.",
+        },
+        {
+          question: "Preciso ser atleta para ser acompanhado?",
+          answer:
+            "Não. A nutrição esportiva é o meu principal foco, mas o atendimento é amplo: emagrecimento, ganho de massa, ajuste de exames, saúde geral e reorganização da rotina alimentar. O que muda é a estratégia, não o cuidado.",
+        },
+      ],
+    },
+    finalCta: {
+      heading: "Pronto para organizar sua alimentação com método?",
+      support:
+        "Me chame no WhatsApp para conhecer o acompanhamento, tirar dúvidas e escolher o melhor horário para a primeira consulta.",
+    },
+    footer: {
+      copyright: `Copyright © ${year} Vinicius Correard — Nutricionista`,
+    },
+    metadata: {
+      title: "Vinicius Correard | Nutricionista CRN-10/14710P",
+      description:
+        "Nutrição esportiva e clínica com planos alimentares individualizados para performance, saúde e rotina real. Atendimento online e presencial.",
+    },
+  };
+}
+
+export function sanitizeContent(input: unknown): SiteContent {
+  const defaults = createDefaultContent();
+  if (!input || typeof input !== "object") return defaults;
+
+  const raw = input as Partial<SiteContent>;
+  const merged: SiteContent = {
+    ...defaults,
+    ...raw,
+    hero: { ...defaults.hero, ...(raw.hero ?? {}) },
+    situations: {
+      ...defaults.situations,
+      ...(raw.situations ?? {}),
+      items:
+        Array.isArray(raw.situations?.items) && raw.situations.items.length > 0
+          ? raw.situations.items.map((item, index) => ({
+              title: String(item?.title ?? defaults.situations.items[index]?.title ?? ""),
+              description: String(
+                item?.description ?? defaults.situations.items[index]?.description ?? "",
+              ),
+            }))
+          : defaults.situations.items,
+    },
+    about: {
+      ...defaults.about,
+      ...(raw.about ?? {}),
+      paragraphs: Array.isArray(raw.about?.paragraphs)
+        ? raw.about.paragraphs.map(String)
+        : defaults.about.paragraphs,
+    },
+    firstMeeting: {
+      ...defaults.firstMeeting,
+      ...(raw.firstMeeting ?? {}),
+      paragraphs: Array.isArray(raw.firstMeeting?.paragraphs)
+        ? raw.firstMeeting.paragraphs.map(String)
+        : defaults.firstMeeting.paragraphs,
+    },
+    care: {
+      ...defaults.care,
+      ...(raw.care ?? {}),
+      paragraphs: Array.isArray(raw.care?.paragraphs)
+        ? raw.care.paragraphs.map(String)
+        : defaults.care.paragraphs,
+      facts: Array.isArray(raw.care?.facts)
+        ? raw.care.facts.map((fact, index) => ({
+            title: String(fact?.title ?? defaults.care.facts[index]?.title ?? ""),
+            description: String(
+              fact?.description ?? defaults.care.facts[index]?.description ?? "",
+            ),
+          }))
+        : defaults.care.facts,
+    },
+    faq: {
+      ...defaults.faq,
+      ...(raw.faq ?? {}),
+      items: Array.isArray(raw.faq?.items)
+        ? raw.faq.items.map((item, index) => ({
+            question: String(item?.question ?? defaults.faq.items[index]?.question ?? ""),
+            answer: String(item?.answer ?? defaults.faq.items[index]?.answer ?? ""),
+          }))
+        : defaults.faq.items,
+    },
+    finalCta: { ...defaults.finalCta, ...(raw.finalCta ?? {}) },
+    footer: { ...defaults.footer, ...(raw.footer ?? {}) },
+    metadata: { ...defaults.metadata, ...(raw.metadata ?? {}) },
+    nav: Array.isArray(raw.nav)
+      ? raw.nav.map((item, index) => ({
+          href: String(item?.href ?? defaults.nav[index]?.href ?? "#"),
+          label: String(item?.label ?? defaults.nav[index]?.label ?? ""),
+        }))
+      : defaults.nav,
+  };
+
+  merged.name = String(raw.name ?? defaults.name);
+  merged.fullName = String(raw.fullName ?? defaults.fullName);
+  merged.title = String(raw.title ?? defaults.title);
+  merged.crn = String(raw.crn ?? defaults.crn);
+  merged.phone = String(raw.phone ?? defaults.phone);
+  merged.email = String(raw.email ?? defaults.email);
+  merged.instagramUrl = sanitizeInstagramUrl(
+    typeof raw.instagramUrl === "string" ? raw.instagramUrl : defaults.instagramUrl,
+  );
+  merged.whatsappUrl = getSafeWhatsAppUrl(
+    typeof raw.whatsappUrl === "string" ? raw.whatsappUrl : defaults.whatsappUrl,
+  );
+  merged.whatsappLabel = String(raw.whatsappLabel ?? defaults.whatsappLabel);
+  merged.contactCtaLabel = String(raw.contactCtaLabel ?? defaults.contactCtaLabel);
+  merged.finalCtaLabel = String(raw.finalCtaLabel ?? defaults.finalCtaLabel);
+  merged.portraitSrc = sanitizePortraitSrc(
+    typeof raw.portraitSrc === "string" ? raw.portraitSrc : defaults.portraitSrc,
+  );
+  merged.portraitUpdatedAt = String(raw.portraitUpdatedAt ?? defaults.portraitUpdatedAt);
+  merged.heroVariant = sanitizeHeroVariant(raw.heroVariant);
+
+  return merged;
+}
+
+/** Nome dividido em linhas curtas para o miolo da marca circular. */
+export function circleMarkLines(name: string): string[] {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return [];
+  if (words.length <= 2) return words.map((word) => word.toUpperCase());
+  return [words[0].toUpperCase(), words.slice(1).join(" ").toUpperCase()];
+}
+
+function sanitizeHeroVariant(value: unknown): HeroVariant {
+  if (value === "1" || value === "2" || value === "3") return value;
+  return "1";
+}
+
+function sanitizeInstagramUrl(value: string): string {
+  const raw = value.trim();
+  if (!raw) return "";
+
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== "https:") return "";
+    if (url.hostname !== "instagram.com" && url.hostname !== "www.instagram.com") {
+      return "";
+    }
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
+/** String vazia é válida: significa "ainda sem foto", e o site exibe a marca circular. */
+function sanitizePortraitSrc(value: string): string {
+  const raw = value.trim();
+  if (!raw) return "";
+
+  const pathOnly = raw.split("?")[0] ?? "";
+
+  if (/^\/brand\/[a-zA-Z0-9/_-]+\.(png|jpe?g|webp|gif)$/i.test(pathOnly)) {
+    if (pathOnly.includes("..")) return "";
+    return pathOnly;
+  }
+
+  // URLs públicas do Vercel Blob
+  try {
+    const url = new URL(raw);
+    if (
+      url.protocol === "https:" &&
+      (url.hostname.endsWith(".public.blob.vercel-storage.com") ||
+        url.hostname === "blob.vercel-storage.com")
+    ) {
+      return url.toString();
+    }
+  } catch {
+    // ignore
+  }
+
+  return "";
+}
