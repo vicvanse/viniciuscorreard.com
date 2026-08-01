@@ -19,7 +19,7 @@ export function About({ content }: AboutProps) {
       className="atmosphere relative overflow-hidden px-5 py-20 sm:px-8 sm:py-28"
       aria-labelledby="about-heading"
     >
-      <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,480px)] lg:items-start lg:gap-14 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,520px)]">
+      <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-14">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -42,10 +42,10 @@ export function About({ content }: AboutProps) {
           </div>
         </motion.div>
 
-        {/* Mobile: empilhadas. Desktop: lado a lado, ~230–250px cada. */}
-        <div className="mx-auto grid w-full max-w-sm grid-cols-1 gap-4 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:gap-4">
+        {/* Mobile: empilhadas. Desktop: lado a lado, largura fixa por foto. */}
+        <div className="mx-auto flex w-full max-w-sm flex-col gap-4 lg:mx-0 lg:max-w-none lg:flex-row lg:gap-4">
           <motion.div
-            className="relative aspect-[4/5] overflow-hidden rounded-[1.25rem] border border-line bg-canvas shadow-[0_20px_50px_rgba(0,0,0,0.35)]"
+            className="relative aspect-[4/5] w-full overflow-hidden rounded-[1.25rem] border border-line bg-canvas shadow-[0_20px_50px_rgba(0,0,0,0.35)] lg:w-[240px] lg:shrink-0 xl:w-[260px]"
             initial={reduceMotion ? false : { opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-80px" }}
@@ -57,7 +57,7 @@ export function About({ content }: AboutProps) {
                   src={portraitSrc}
                   alt={`${name}, ${crn}`}
                   fill
-                  sizes="(max-width: 1024px) 100vw, 250px"
+                  sizes="(max-width: 1024px) 100vw, 260px"
                   className="object-cover object-[center_15%]"
                   key={`${portraitSrc}-${portraitUpdatedAt}`}
                 />
@@ -80,7 +80,7 @@ export function About({ content }: AboutProps) {
           </motion.div>
 
           <motion.div
-            className="relative aspect-[4/5] overflow-hidden rounded-[1.25rem] border border-line bg-canvas shadow-[0_20px_50px_rgba(0,0,0,0.35)]"
+            className="relative aspect-[4/5] w-full overflow-hidden rounded-[1.25rem] border border-line bg-canvas shadow-[0_20px_50px_rgba(0,0,0,0.35)] lg:w-[240px] lg:shrink-0 xl:w-[260px]"
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -90,7 +90,7 @@ export function About({ content }: AboutProps) {
               src="/brand/vinicius-gym.webp"
               alt={`${name} em treino`}
               fill
-              sizes="(max-width: 1024px) 100vw, 250px"
+              sizes="(max-width: 1024px) 100vw, 260px"
               className="object-cover object-[center_20%]"
             />
           </motion.div>
