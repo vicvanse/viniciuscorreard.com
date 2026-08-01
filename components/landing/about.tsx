@@ -11,7 +11,16 @@ interface AboutProps {
 
 export function About({ content }: AboutProps) {
   const reduceMotion = useReducedMotion();
-  const { about, name, title, crn, portraitSrc, portraitUpdatedAt } = content;
+  const {
+    about,
+    name,
+    title,
+    crn,
+    portraitSrc,
+    portraitUpdatedAt,
+    gymSrc,
+    gymUpdatedAt,
+  } = content;
 
   return (
     <section
@@ -46,7 +55,7 @@ export function About({ content }: AboutProps) {
         {/* Abaixo do texto; altura moderada para não competir com o hero. */}
         <div className="mx-auto flex w-full max-w-sm flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row sm:gap-4">
           <motion.div
-            className="relative h-[300px] w-full overflow-hidden rounded-[1.25rem] border border-line bg-canvas shadow-[0_20px_50px_rgba(0,0,0,0.35)] sm:h-[280px] sm:w-[210px] sm:shrink-0 lg:h-[300px] lg:w-[225px]"
+            className="relative h-[405px] w-full overflow-hidden rounded-[1.25rem] border border-line bg-canvas shadow-[0_20px_50px_rgba(0,0,0,0.35)] sm:h-[435px] sm:w-[327px] sm:shrink-0 lg:h-[466px] lg:w-[350px]"
             initial={reduceMotion ? false : { opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-80px" }}
@@ -58,7 +67,7 @@ export function About({ content }: AboutProps) {
                   src={portraitSrc}
                   alt={`${name}, ${crn}`}
                   fill
-                  sizes="(max-width: 640px) 100vw, 225px"
+                  sizes="(max-width: 640px) 100vw, 350px"
                   className="object-cover object-[center_15%]"
                   key={`${portraitSrc}-${portraitUpdatedAt}`}
                 />
@@ -80,21 +89,24 @@ export function About({ content }: AboutProps) {
             )}
           </motion.div>
 
-          <motion.div
-            className="relative h-[300px] w-full overflow-hidden rounded-[1.25rem] border border-line bg-canvas shadow-[0_20px_50px_rgba(0,0,0,0.35)] sm:h-[280px] sm:w-[210px] sm:shrink-0 lg:h-[300px] lg:w-[225px]"
-            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.65, delay: reduceMotion ? 0 : 0.08 }}
-          >
-            <Image
-              src="/brand/vinicius-gym.webp"
-              alt={`${name} em treino`}
-              fill
-              sizes="(max-width: 640px) 100vw, 225px"
-              className="object-cover object-[center_20%]"
-            />
-          </motion.div>
+          {gymSrc ? (
+            <motion.div
+              className="relative h-[405px] w-full overflow-hidden rounded-[1.25rem] border border-line bg-canvas shadow-[0_20px_50px_rgba(0,0,0,0.35)] sm:h-[435px] sm:w-[327px] sm:shrink-0 lg:h-[466px] lg:w-[350px]"
+              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.65, delay: reduceMotion ? 0 : 0.08 }}
+            >
+              <Image
+                src={gymSrc}
+                alt={`${name} em treino`}
+                fill
+                sizes="(max-width: 640px) 100vw, 350px"
+                className="object-cover object-[center_20%]"
+                key={`${gymSrc}-${gymUpdatedAt}`}
+              />
+            </motion.div>
+          ) : null}
         </div>
       </div>
     </section>

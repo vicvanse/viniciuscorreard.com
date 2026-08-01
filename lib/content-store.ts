@@ -122,9 +122,10 @@ export async function writeSiteContent(
   return writeToDisk(content);
 }
 
-export async function uploadPortraitBlob(
+export async function uploadMediaBlob(
   bytes: Buffer,
   filename: string,
+  folder: "portraits" | "gym" | "cards" = "portraits",
 ): Promise<string> {
   if (!isBlobStoreEnabled()) {
     throw new Error("Blob Store não configurado");
@@ -134,7 +135,7 @@ export async function uploadPortraitBlob(
 
   for (const access of ["public", "private"] as const) {
     try {
-      const blob = await put(`portraits/${filename}`, bytes, {
+      const blob = await put(`${folder}/${filename}`, bytes, {
         access,
         contentType: "image/webp",
         addRandomSuffix: true,
@@ -149,7 +150,15 @@ export async function uploadPortraitBlob(
     }
   }
 
-  throw new Error(`Falha no upload da foto (${errors.join(" | ")})`);
+  throw new Error(`Falha no upload da imagem (${errors.join(" | ")})`);
+}
+
+/** @deprecated Use uploadMediaBlob */
+export async function uploadPortraitBlob(
+  bytes: Buffer,
+  filename: string,
+): Promise<string> {
+  return uploadMediaBlob(bytes, filename, "portraits");
 }
 
 export function hasBlobStore(): boolean {

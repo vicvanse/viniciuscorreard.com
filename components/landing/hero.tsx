@@ -14,8 +14,7 @@ interface HeroProps {
   content: SiteContent;
 }
 
-const HERO_CARD_SRC = "/brand/hero-card.webp";
-const HERO_CARD_FRAMED_SRC = "/brand/business-card.webp";
+const DEFAULT_CARD_SRC = "/brand/business-card.webp";
 
 function HeroCopy({
   content,
@@ -80,9 +79,11 @@ function HeroCopy({
 }
 
 function FramedCard({
+  src,
   sizes,
   className,
 }: {
+  src: string;
   sizes: string;
   className?: string;
 }) {
@@ -92,7 +93,7 @@ function FramedCard({
     >
       <div className="overflow-hidden rounded-[0.8rem]">
         <Image
-          src={HERO_CARD_FRAMED_SRC}
+          src={src}
           alt="Identidade visual Vinicius Correard"
           width={1024}
           height={662}
@@ -106,7 +107,13 @@ function FramedCard({
   );
 }
 
-function FullBleedCardBackdrop({ reduceMotion }: { reduceMotion: boolean | null }) {
+function FullBleedCardBackdrop({
+  src,
+  reduceMotion,
+}: {
+  src: string;
+  reduceMotion: boolean | null;
+}) {
   return (
     <>
       <motion.div
@@ -116,7 +123,7 @@ function FullBleedCardBackdrop({ reduceMotion }: { reduceMotion: boolean | null 
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
         <Image
-          src={HERO_CARD_SRC}
+          src={src}
           alt=""
           fill
           priority
@@ -152,13 +159,14 @@ export function Hero({ content }: HeroProps) {
   const isCentered = align === "center";
   const showCircle = content.showCircleMark !== false;
   const lines = circleMarkLines(content.name);
+  const cardSrc = content.cardSrc?.trim() || DEFAULT_CARD_SRC;
 
   return (
     <section
       id="inicio"
       className="relative isolate min-h-[100svh] overflow-hidden bg-canvas"
     >
-      {/* Mobile: quadro do cartão acima do texto (como no Pedro) */}
+      {/* Mobile: v4 = só círculo+cartão; demais = quadro (+ círculo opcional) */}
       <div className="sm:hidden">
         <SoftAtmosphere />
         <div className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-5 pt-24 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
@@ -168,18 +176,45 @@ export function Hero({ content }: HeroProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
           >
-            <figure className="mb-6">
-              <FramedCard sizes="320px" className="mx-auto max-w-[19.5rem]" />
-            </figure>
-            {showCircle ? (
-              <div className="mb-8 flex justify-center">
-                <CircleMark
-                  lines={lines}
-                  subtitle={content.hero.circleSubtitle}
-                  sizePx={240}
-                />
-              </div>
-            ) : null}
+            {variant === "4" ? (
+              showCircle ? (
+                <div className="mb-8 flex justify-center">
+                  <CircleMark
+                    lines={lines}
+                    subtitle={content.hero.circleSubtitle}
+                    sizePx={280}
+                    backdropSrc={cardSrc}
+                  />
+                </div>
+              ) : (
+                <figure className="mb-6">
+                  <FramedCard
+                    src={cardSrc}
+                    sizes="320px"
+                    className="mx-auto max-w-[19.5rem]"
+                  />
+                </figure>
+              )
+            ) : (
+              <>
+                <figure className="mb-6">
+                  <FramedCard
+                    src={cardSrc}
+                    sizes="320px"
+                    className="mx-auto max-w-[19.5rem]"
+                  />
+                </figure>
+                {showCircle ? (
+                  <div className="mb-8 flex justify-center">
+                    <CircleMark
+                      lines={lines}
+                      subtitle={content.hero.circleSubtitle}
+                      sizePx={240}
+                    />
+                  </div>
+                ) : null}
+              </>
+            )}
             <HeroCopy content={content} />
           </motion.div>
         </div>
@@ -189,7 +224,7 @@ export function Hero({ content }: HeroProps) {
       <div className="hidden sm:block">
         {variant === "1" ? (
           <>
-            <FullBleedCardBackdrop reduceMotion={reduceMotion} />
+            <FullBleedCardBackdrop src={cardSrc} reduceMotion={reduceMotion} />
             <div
               className={`relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-8 pt-28 pb-20 lg:justify-center lg:pt-24 lg:pb-24 ${
                 isCentered ? "items-center" : "items-start"
@@ -240,12 +275,13 @@ export function Hero({ content }: HeroProps) {
                       lines={lines}
                       subtitle={content.hero.circleSubtitle}
                       sizePx={360}
-                      backdropSrc={HERO_CARD_FRAMED_SRC}
+                      backdropSrc={cardSrc}
                     />
                   </div>
                 ) : (
                   <figure className="mb-8">
                     <FramedCard
+                      src={cardSrc}
                       sizes="(max-width: 1024px) 70vw, 560px"
                       className={`max-w-[34rem] ${isCentered ? "mx-auto" : ""}`}
                     />
@@ -271,8 +307,9 @@ export function Hero({ content }: HeroProps) {
               >
                 <figure className="mb-8">
                   <FramedCard
-                    sizes="(max-width: 1024px) 70vw, 560px"
-                    className="mx-auto max-w-[34rem]"
+                    src={cardSrc}
+                    sizes="(max-width: 1024px) 56vw, 448px"
+                    className="mx-auto max-w-[27.2rem]"
                   />
                 </figure>
                 <HeroCopy content={content} centered={isCentered} />
@@ -307,7 +344,10 @@ export function Hero({ content }: HeroProps) {
                   ease: [0.22, 1, 0.36, 1],
                 }}
               >
-                <FramedCard sizes="(max-width: 1024px) 80vw, 560px" />
+                <FramedCard
+                  src={cardSrc}
+                  sizes="(max-width: 1024px) 80vw, 560px"
+                />
               </motion.figure>
             </div>
           </>

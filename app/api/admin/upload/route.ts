@@ -7,9 +7,15 @@ import { isAdminAuthenticated } from "@/lib/admin-auth";
 import {
   hasBlobStore,
   readSiteContent,
-  uploadPortraitBlob,
+  uploadMediaBlob,
   writeSiteContent,
 } from "@/lib/content-store";
+import {
+  createDefaultContent,
+  isMediaSlot,
+  type MediaSlot,
+  type SiteContent,
+} from "@/lib/site-content";
 
 export const runtime = "nodejs";
 
@@ -22,6 +28,51 @@ const ALLOWED_TYPES = new Set([
   "image/gif",
 ]);
 
+const SLOT_FOLDERS: Record<MediaSlot, "portraits" | "gym" | "cards"> = {
+  portrait: "portraits",
+  gym: "gym",
+  card: "cards",
+};
+
+const SLOT_RESIZE: Record<
+  MediaSlot,
+  { width: number; height: number }
+> = {
+  portrait: { width: 1600, height: 2000 },
+  gym: { width: 1600, height: 2000 },
+  card: { width: 1600, height: 1200 },
+};
+
+function applySlotSrc(
+  content: SiteContent,
+  slot: MediaSlot,
+  src: string,
+  updatedAt: string,
+): SiteContent {
+  if (slot === "portrait") {
+    return { ...content, portraitSrc: src, portraitUpdatedAt: updatedAt };
+  }
+  if (slot === "gym") {
+    return { ...content, gymSrc: src, gymUpdatedAt: updatedAt };
+  }
+  return { ...content, cardSrc: src, cardUpdatedAt: updatedAt };
+}
+
+function clearSlot(content: SiteContent, slot: MediaSlot): SiteContent {
+  const defaults = createDefaultContent();
+  if (slot === "portrait") {
+    return { ...content, portraitSrc: "", portraitUpdatedAt: "" };
+  }
+  if (slot === "gym") {
+    return { ...content, gymSrc: "", gymUpdatedAt: "" };
+  }
+  return {
+    ...content,
+    cardSrc: defaults.cardSrc,
+    cardUpdatedAt: "",
+  };
+}
+
 export async function POST(request: NextRequest) {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
@@ -33,6 +84,9 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Formulário inválido." }, { status: 400 });
   }
+
+  const slotRaw = form.get("slot");
+  const slot = isMediaSlot(slotRaw) ? slotRaw : "portrait";
 
   const file = form.get("file");
   if (!(file instanceof File)) {
@@ -55,11 +109,12 @@ export async function POST(request: NextRequest) {
 
   try {
     const input = Buffer.from(await file.arrayBuffer());
+    const resize = SLOT_RESIZE[slot];
     const optimized = await sharp(input)
       .rotate()
       .resize({
-        width: 1600,
-        height: 2000,
+        width: resize.width,
+        height: resize.height,
         fit: "inside",
         withoutEnlargement: true,
       })
@@ -67,34 +122,31 @@ export async function POST(request: NextRequest) {
       .toBuffer();
 
     const stamp = Date.now();
-    let portraitSrc: string;
+    const filename = `${slot}-${stamp}.webp`;
+    let mediaSrc: string;
 
     if (hasBlobStore()) {
-      portraitSrc = await uploadPortraitBlob(
-        optimized,
-        `portrait-${stamp}.webp`,
-      );
+      mediaSrc = await uploadMediaBlob(optimized, filename, SLOT_FOLDERS[slot]);
     } else {
-      const relative = `/brand/uploads/portrait-${stamp}.webp`;
+      const relative = `/brand/uploads/${filename}`;
       const absolute = path.join(process.cwd(), "public", "brand", "uploads");
       await mkdir(absolute, { recursive: true });
-      await writeFile(path.join(absolute, `portrait-${stamp}.webp`), optimized);
-      portraitSrc = relative;
+      await writeFile(path.join(absolute, filename), optimized);
+      mediaSrc = relative;
     }
 
     const current = await readSiteContent();
-    const saved = await writeSiteContent({
-      ...current,
-      portraitSrc,
-      portraitUpdatedAt: new Date(stamp).toISOString(),
-    });
+    const saved = await writeSiteContent(
+      applySlotSrc(current, slot, mediaSrc, new Date(stamp).toISOString()),
+    );
 
     revalidatePath("/");
     revalidatePath("/admin");
 
     return NextResponse.json({
       content: saved,
-      portraitSrc,
+      slot,
+      src: mediaSrc,
     });
   } catch {
     return NextResponse.json(
@@ -102,6 +154,37 @@ export async function POST(request: NextRequest) {
         error: hasBlobStore()
           ? "Falha ao gravar a imagem no storage."
           : "Falha ao gravar a imagem. Configure BLOB_READ_WRITE_TOKEN na Vercel (Storage → Blob).",
+      },
+      { status: 500 },
+    );
+  }
+}
+
+/** Remove a mídia do slot (retrato/academia ficam vazios; cartão volta ao padrão). */
+export async function DELETE(request: NextRequest) {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
+  }
+
+  const slotRaw = request.nextUrl.searchParams.get("slot");
+  if (!isMediaSlot(slotRaw)) {
+    return NextResponse.json({ error: "Slot inválido." }, { status: 400 });
+  }
+
+  try {
+    const current = await readSiteContent();
+    const saved = await writeSiteContent(clearSlot(current, slotRaw));
+
+    revalidatePath("/");
+    revalidatePath("/admin");
+
+    return NextResponse.json({ content: saved, slot: slotRaw });
+  } catch {
+    return NextResponse.json(
+      {
+        error: hasBlobStore()
+          ? "Falha ao atualizar o conteúdo no storage."
+          : "Falha ao atualizar. Configure BLOB_READ_WRITE_TOKEN na Vercel (Storage → Blob).",
       },
       { status: 500 },
     );

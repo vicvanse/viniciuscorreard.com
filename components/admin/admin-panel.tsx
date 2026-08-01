@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, startTransition } from "react";
 import Link from "next/link";
@@ -72,7 +72,9 @@ export function AdminPanel({
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [uploadingSlot, setUploadingSlot] = useState<
+    "portrait" | "gym" | "card" | null
+  >(null);
 
   useEffect(() => {
     startTransition(() => {
@@ -84,14 +86,18 @@ export function AdminPanel({
     return <AdminLoginForm queryError={queryError} />;
   }
 
-  async function handlePortraitUpload(file: File | null) {
+  async function handleMediaUpload(
+    slot: "portrait" | "gym" | "card",
+    file: File | null,
+  ) {
     if (!file) return;
-    setIsUploading(true);
+    setUploadingSlot(slot);
     setError(null);
     setStatus(null);
     try {
       const body = new FormData();
       body.append("file", file);
+      body.append("slot", slot);
       const response = await fetch("/api/admin/upload", {
         method: "POST",
         body,
@@ -105,11 +111,46 @@ export function AdminPanel({
         return;
       }
       if (data.content) setContent(data.content);
-      setStatus("Foto atualizada para todo o site.");
+      const labels = {
+        portrait: "Foto do Sobre mim",
+        gym: "Foto da academia",
+        card: "Cartão do hero",
+      } as const;
+      setStatus(`${labels[slot]} atualizado para todo o site.`);
     } catch {
       setError("Erro ao enviar a imagem.");
     } finally {
-      setIsUploading(false);
+      setUploadingSlot(null);
+    }
+  }
+
+  async function handleMediaRemove(slot: "portrait" | "gym" | "card") {
+    setUploadingSlot(slot);
+    setError(null);
+    setStatus(null);
+    try {
+      const response = await fetch(
+        `/api/admin/upload?slot=${encodeURIComponent(slot)}`,
+        { method: "DELETE" },
+      );
+      const data = (await response.json()) as {
+        content?: SiteContent;
+        error?: string;
+      };
+      if (!response.ok) {
+        setError(data.error || "Falha ao remover.");
+        return;
+      }
+      if (data.content) setContent(data.content);
+      setStatus(
+        slot === "card"
+          ? "Cartão restaurado para a imagem padrão."
+          : "Imagem removida do site.",
+      );
+    } catch {
+      setError("Erro ao remover a imagem.");
+    } finally {
+      setUploadingSlot(null);
     }
   }
 
@@ -147,8 +188,8 @@ export function AdminPanel({
         <div>
           <h1 className="font-display text-3xl text-ink">Editar site</h1>
           <p className="mt-2 text-sm text-muted">
-            Textos e foto do quadro Sobre mim. Alterações aparecem para todos os
-            visitantes.
+            Textos, fotos do Sobre mim e cartão do hero. Alterações aparecem para
+            todos os visitantes.
           </p>
         </div>
         <div className="flex gap-2">
@@ -170,47 +211,59 @@ export function AdminPanel({
       </div>
 
       <section className={`${sectionClass} mt-8`}>
-        <h2 className="font-display text-xl text-ink">Foto do quadro Sobre mim</h2>
+        <h2 className="font-display text-xl text-ink">Fotos e cartão</h2>
         <p className="mt-2 text-sm text-muted">
-          Envie JPG, PNG ou WebP (até 4 MB). Enquanto não houver foto, o site
-          exibe a marca circular animada nesse espaço.
+          JPG, PNG ou WebP (até 4 MB). Adicione, substitua ou remova cada imagem.
         </p>
-        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end">
-          <div className="relative aspect-[4/5] w-40 overflow-hidden rounded-xl border border-line bg-canvas">
-            {content.portraitSrc ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={
-                  content.portraitUpdatedAt
-                    ? `${content.portraitSrc}?v=${encodeURIComponent(content.portraitUpdatedAt)}`
-                    : content.portraitSrc
-                }
-                alt="Pré-visualização"
-                className="h-full w-full object-cover object-[center_20%]"
-              />
-            ) : (
-              <p className="flex h-full items-center justify-center px-3 text-center text-xs text-muted">
-                Sem foto · usando a marca circular
-              </p>
-            )}
-          </div>
-          <label className={labelClass}>
-            Nova foto
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              className={`${fieldClass} file:mr-3 file:rounded-full file:border-0 file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-black`}
-              disabled={isUploading}
-              onChange={(event) => {
-                const file = event.target.files?.[0] ?? null;
-                void handlePortraitUpload(file);
-                event.target.value = "";
-              }}
-            />
-          </label>
+        <div className="mt-5 space-y-5">
+          <MediaSlotEditor
+            title="Foto do Sobre mim"
+            description="Quadro principal. Sem foto, o site usa a marca circular."
+            src={content.portraitSrc}
+            updatedAt={content.portraitUpdatedAt}
+            aspectClass="aspect-[4/5]"
+            emptyLabel="Sem foto · marca circular"
+            busy={uploadingSlot === "portrait"}
+            canRemove={Boolean(content.portraitSrc)}
+            removeLabel="Remover foto"
+            onUpload={(file) => void handleMediaUpload("portrait", file)}
+            onRemove={() => void handleMediaRemove("portrait")}
+            fieldClass={fieldClass}
+            labelClass={labelClass}
+          />
+          <MediaSlotEditor
+            title="Foto da academia"
+            description="Segunda foto do Sobre mim, ao lado da principal no desktop."
+            src={content.gymSrc}
+            updatedAt={content.gymUpdatedAt}
+            aspectClass="aspect-[4/5]"
+            emptyLabel="Sem foto · quadro oculto"
+            busy={uploadingSlot === "gym"}
+            canRemove={Boolean(content.gymSrc)}
+            removeLabel="Remover foto"
+            onUpload={(file) => void handleMediaUpload("gym", file)}
+            onRemove={() => void handleMediaRemove("gym")}
+            fieldClass={fieldClass}
+            labelClass={labelClass}
+          />
+          <MediaSlotEditor
+            title="Cartão do hero"
+            description="Usado nas versões 1–4 do hero (fundo, quadro e círculo)."
+            src={content.cardSrc}
+            updatedAt={content.cardUpdatedAt}
+            aspectClass="aspect-[16/10]"
+            emptyLabel="Cartão padrão"
+            busy={uploadingSlot === "card"}
+            canRemove={Boolean(content.cardSrc)}
+            removeLabel="Restaurar padrão"
+            onUpload={(file) => void handleMediaUpload("card", file)}
+            onRemove={() => void handleMediaRemove("card")}
+            fieldClass={fieldClass}
+            labelClass={labelClass}
+          />
         </div>
-        {isUploading ? (
-          <p className="mt-3 text-sm text-ink-soft">Enviando foto…</p>
+        {uploadingSlot ? (
+          <p className="mt-3 text-sm text-ink-soft">Atualizando imagem…</p>
         ) : null}
       </section>
 
@@ -955,6 +1008,90 @@ function HeroAlignPreview({
         <div className={`mt-1 flex gap-1 ${isCenter ? "" : ""}`}>
           <div className="h-2 w-8 rounded-full bg-white/80" />
           <div className="h-2 w-8 rounded-full border border-white/40" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MediaSlotEditor({
+  title,
+  description,
+  src,
+  updatedAt,
+  aspectClass,
+  emptyLabel,
+  busy,
+  canRemove,
+  removeLabel,
+  onUpload,
+  onRemove,
+  fieldClass,
+  labelClass,
+}: {
+  title: string;
+  description: string;
+  src: string;
+  updatedAt: string;
+  aspectClass: string;
+  emptyLabel: string;
+  busy: boolean;
+  canRemove: boolean;
+  removeLabel: string;
+  onUpload: (file: File | null) => void;
+  onRemove: () => void;
+  fieldClass: string;
+  labelClass: string;
+}) {
+  const previewSrc =
+    src && updatedAt ? `${src}?v=${encodeURIComponent(updatedAt)}` : src;
+
+  return (
+    <div className={cardClass}>
+      <h3 className="font-display text-base text-ink">{title}</h3>
+      <p className="mt-1 text-sm text-muted">{description}</p>
+      <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end">
+        <div
+          className={`relative w-40 overflow-hidden rounded-xl border border-line bg-canvas ${aspectClass}`}
+        >
+          {src ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={previewSrc}
+              alt={`Pré-visualização: ${title}`}
+              className="h-full w-full object-cover object-center"
+            />
+          ) : (
+            <p className="flex h-full items-center justify-center px-3 text-center text-xs text-muted">
+              {emptyLabel}
+            </p>
+          )}
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col gap-3">
+          <label className={labelClass}>
+            {src ? "Substituir imagem" : "Adicionar imagem"}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              className={`${fieldClass} file:mr-3 file:rounded-full file:border-0 file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-black`}
+              disabled={busy}
+              onChange={(event) => {
+                const file = event.target.files?.[0] ?? null;
+                onUpload(file);
+                event.target.value = "";
+              }}
+            />
+          </label>
+          {canRemove ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onRemove}
+              className="self-start rounded-full border border-line px-4 py-2 text-sm text-ink-soft hover:border-white/30 hover:text-ink disabled:opacity-50"
+            >
+              {removeLabel}
+            </button>
+          ) : null}
         </div>
       </div>
     </div>

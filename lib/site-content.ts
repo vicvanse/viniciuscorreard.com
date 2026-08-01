@@ -42,9 +42,15 @@ export interface SiteContent {
   whatsappLabel: string;
   contactCtaLabel: string;
   finalCtaLabel: string;
-  /** Foto do quadro Sobre mim. Vazio exibe a marca circular no lugar. */
+  /** Foto principal do Sobre mim. Vazio exibe a marca circular no lugar. */
   portraitSrc: string;
   portraitUpdatedAt: string;
+  /** Segunda foto do Sobre mim (ex.: academia). Vazio oculta o quadro. */
+  gymSrc: string;
+  gymUpdatedAt: string;
+  /** Cartão / identidade visual do hero (versões 1–4). */
+  cardSrc: string;
+  cardUpdatedAt: string;
   /** Layout do hero no computador: 1 full-bleed, 2 quadro, 3 lado a lado, 4 círculo com fundo. */
   heroVariant: HeroVariant;
   /** Alinhamento do bloco de texto do hero no desktop. */
@@ -119,6 +125,10 @@ export function createDefaultContent(): SiteContent {
     finalCtaLabel: "Agendar consulta pelo WhatsApp",
     portraitSrc: "/brand/vinicius-portrait.webp",
     portraitUpdatedAt: "",
+    gymSrc: "/brand/vinicius-gym.webp",
+    gymUpdatedAt: "",
+    cardSrc: "/brand/business-card.webp",
+    cardUpdatedAt: "",
     heroVariant: "1",
     heroAlign: "left",
     showCircleMark: true,
@@ -341,10 +351,20 @@ export function sanitizeContent(input: unknown): SiteContent {
   merged.whatsappLabel = String(raw.whatsappLabel ?? defaults.whatsappLabel);
   merged.contactCtaLabel = String(raw.contactCtaLabel ?? defaults.contactCtaLabel);
   merged.finalCtaLabel = String(raw.finalCtaLabel ?? defaults.finalCtaLabel);
-  merged.portraitSrc = sanitizePortraitSrc(
+  merged.portraitSrc = sanitizeMediaSrc(
     typeof raw.portraitSrc === "string" ? raw.portraitSrc : defaults.portraitSrc,
   );
   merged.portraitUpdatedAt = String(raw.portraitUpdatedAt ?? defaults.portraitUpdatedAt);
+  merged.gymSrc = sanitizeMediaSrc(
+    typeof raw.gymSrc === "string" ? raw.gymSrc : defaults.gymSrc,
+  );
+  merged.gymUpdatedAt = String(raw.gymUpdatedAt ?? defaults.gymUpdatedAt);
+  merged.cardSrc = sanitizeMediaSrc(
+    typeof raw.cardSrc === "string" ? raw.cardSrc : defaults.cardSrc,
+  );
+  // Cartão nunca fica vazio: sem upload válido, volta ao asset padrão.
+  if (!merged.cardSrc) merged.cardSrc = defaults.cardSrc;
+  merged.cardUpdatedAt = String(raw.cardUpdatedAt ?? defaults.cardUpdatedAt);
   merged.heroVariant = sanitizeHeroVariant(raw.heroVariant);
   merged.heroAlign = sanitizeHeroAlign(raw.heroAlign);
   merged.showCircleMark =
@@ -389,8 +409,8 @@ function sanitizeInstagramUrl(value: string): string {
   }
 }
 
-/** String vazia é válida: significa "ainda sem foto", e o site exibe a marca circular. */
-function sanitizePortraitSrc(value: string): string {
+/** Paths locais `/brand/...` ou URLs do Vercel Blob. String vazia = sem mídia. */
+export function sanitizeMediaSrc(value: string): string {
   const raw = value.trim();
   if (!raw) return "";
 
@@ -401,7 +421,6 @@ function sanitizePortraitSrc(value: string): string {
     return pathOnly;
   }
 
-  // URLs públicas do Vercel Blob
   try {
     const url = new URL(raw);
     if (
@@ -416,4 +435,12 @@ function sanitizePortraitSrc(value: string): string {
   }
 
   return "";
+}
+
+export type MediaSlot = "portrait" | "gym" | "card";
+
+export const MEDIA_SLOTS: MediaSlot[] = ["portrait", "gym", "card"];
+
+export function isMediaSlot(value: unknown): value is MediaSlot {
+  return value === "portrait" || value === "gym" || value === "card";
 }
