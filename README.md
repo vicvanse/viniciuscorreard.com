@@ -1,8 +1,8 @@
-# Vinicius Correard — Nutricionista
+# Vinicius Correard · Nutricionista
 
 Landing page em Next.js para **Vinicius Correard**, nutricionista (CRN-10/14710P), com foco em nutrição esportiva e atendimento clínico amplo.
 
-Identidade visual monocromática escura: fundo preto com os cinzas da landing do Vekon (`#0a0a0a` / `#141414`) e a marca circular animada — anéis orbitais em rotação contínua com wordmark pontilhado.
+Identidade visual monocromática escura: fundo preto com os cinzas da landing do Vekon (`#0a0a0a` / `#141414`) e a marca circular animada , anéis orbitais em rotação contínua com wordmark pontilhado.
 
 ## Desenvolvimento
 

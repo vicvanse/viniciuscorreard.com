@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, startTransition } from "react";
 import Link from "next/link";
 import { logoutAdminAction } from "@/app/admin/actions";
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
-import type { HeroVariant, SiteContent } from "@/lib/site-content";
+import type { HeroAlign, HeroVariant, SiteContent } from "@/lib/site-content";
 
 const HERO_VARIANT_OPTIONS: {
   value: HeroVariant;
@@ -13,18 +13,41 @@ const HERO_VARIANT_OPTIONS: {
 }[] = [
   {
     value: "1",
-    title: "Versão 1 — Centralizada",
-    description: "Cartão de fundo full-bleed, círculo animado no centro e texto abaixo.",
+    title: "Versão 1 · Full-bleed",
+    description: "Cartão de fundo ocupando a tela toda, com círculo e texto à esquerda.",
   },
   {
     value: "2",
-    title: "Versão 2 — Empilhada",
-    description: "Cartão emoldurado, círculo e texto alinhados à esquerda.",
+    title: "Versão 2 · Quadro",
+    description: "Como no celular: cartão emoldurado acima do texto.",
   },
   {
     value: "3",
-    title: "Versão 3 — Lado a lado",
-    description: "Texto à esquerda; cartão e círculo à direita.",
+    title: "Versão 3 · Intermediária",
+    description: "Texto à esquerda e cartão emoldurado à direita.",
+  },
+  {
+    value: "4",
+    title: "Versão 4 · Círculo com fundo",
+    description:
+      "O cartão fica como fundo circular do anel, com Vinicius Correard no centro.",
+  },
+];
+
+const HERO_ALIGN_OPTIONS: {
+  value: HeroAlign;
+  title: string;
+  description: string;
+}[] = [
+  {
+    value: "left",
+    title: "Texto à esquerda",
+    description: "Bloco de texto alinhado à esquerda no desktop.",
+  },
+  {
+    value: "center",
+    title: "Texto centralizado",
+    description: "Bloco de texto e CTAs centralizados no desktop.",
   },
 ];
 
@@ -167,7 +190,7 @@ export function AdminPanel({
               />
             ) : (
               <p className="flex h-full items-center justify-center px-3 text-center text-xs text-muted">
-                Sem foto — usando a marca circular
+                Sem foto · usando a marca circular
               </p>
             )}
           </div>
@@ -285,10 +308,10 @@ export function AdminPanel({
             <fieldset>
               <legend className={labelClass}>Layout no computador</legend>
               <p className="mt-1 text-sm text-muted">
-                No celular o layout permanece o círculo acima do texto. Escolha a
-                versão do desktop e salve.
+                No celular o layout permanece o cartão emoldurado acima do texto.
+                Escolha a versão do desktop e salve.
               </p>
-              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {HERO_VARIANT_OPTIONS.map((option) => {
                   const isSelected = (content.heroVariant ?? "1") === option.value;
                   return (
@@ -325,6 +348,77 @@ export function AdminPanel({
                 })}
               </div>
             </fieldset>
+            <fieldset>
+              <legend className={labelClass}>Alinhamento do texto (desktop)</legend>
+              <p className="mt-1 text-sm text-muted">
+                Escolha se o texto do hero fica à esquerda ou centralizado no
+                computador. No celular o layout não muda.
+              </p>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                {HERO_ALIGN_OPTIONS.map((option) => {
+                  const isSelected = (content.heroAlign ?? "left") === option.value;
+                  return (
+                    <label
+                      key={option.value}
+                      className={`cursor-pointer rounded-xl border p-3 transition ${
+                        isSelected
+                          ? "border-white/50 bg-white/5 ring-1 ring-white/40"
+                          : "border-line bg-surface-raised hover:border-white/25"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="heroAlign"
+                        value={option.value}
+                        checked={isSelected}
+                        className="sr-only"
+                        onChange={() =>
+                          setContent({
+                            ...content,
+                            heroAlign: option.value,
+                          })
+                        }
+                      />
+                      <HeroAlignPreview align={option.value} active={isSelected} />
+                      <p className="mt-2.5 text-sm font-medium text-ink">
+                        {option.title}
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-muted">
+                        {option.description}
+                      </p>
+                    </label>
+                  );
+                })}
+              </div>
+            </fieldset>
+            <label
+              className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${
+                content.showCircleMark !== false
+                  ? "border-white/50 bg-white/5 ring-1 ring-white/40"
+                  : "border-line bg-surface-raised hover:border-white/25"
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="mt-1 size-4 rounded border-line accent-white"
+                checked={content.showCircleMark !== false}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    showCircleMark: e.target.checked,
+                  })
+                }
+              />
+              <span>
+                <span className="block text-sm font-medium text-ink">
+                  Exibir círculo (marca animada)
+                </span>
+                <span className="mt-1 block text-xs leading-relaxed text-muted">
+                  Mostra o anel com Vinicius Correard / Nutricionista no hero.
+                  Vale para desktop e celular.
+                </span>
+              </span>
+            </label>
             <label className={labelClass}>
               Eyebrow
               <input
@@ -787,29 +881,82 @@ function HeroVariantPreview({
       aria-hidden
     >
       {variant === "1" ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
-          <div className="size-8 rounded-full border-2 border-white/70" />
-          <div className="h-1.5 w-14 rounded bg-white/60" />
-          <div className="h-1 w-20 rounded bg-white/25" />
-        </div>
+        <>
+          <div className="absolute inset-0 bg-[linear-gradient(120deg,#2a2a2a_0%,#141414_45%,#0a0a0a_100%)] opacity-95" />
+          <div className="absolute inset-0 flex items-center justify-center opacity-40">
+            <div className="size-10 rounded-full border border-white/70" />
+          </div>
+          <div className="absolute inset-y-3 left-2 w-[38%] space-y-1">
+            <div className="h-1 w-10 rounded bg-white/40" />
+            <div className="h-2 w-14 rounded bg-white/70" />
+            <div className="h-1 w-16 rounded bg-white/25" />
+            <div className="h-1 w-12 rounded bg-white/20" />
+          </div>
+        </>
       ) : null}
       {variant === "2" ? (
-        <div className="absolute inset-0 flex flex-col items-start justify-center gap-1.5 px-4">
-          <div className="size-7 self-center rounded-full border-2 border-white/70" />
-          <div className="h-1.5 w-14 rounded bg-white/60" />
-          <div className="h-1 w-20 rounded bg-white/25" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-3">
+          <div className="h-[42%] w-[72%] rounded-sm bg-[linear-gradient(120deg,#3a3a3a,#1a1a1a)] shadow-sm ring-1 ring-white/20" />
+          <div className="h-1.5 w-12 rounded bg-white/70" />
+          <div className="h-1 w-16 rounded bg-white/25" />
         </div>
       ) : null}
       {variant === "3" ? (
-        <div className="absolute inset-0 grid grid-cols-2 items-center gap-2 px-3">
-          <div className="space-y-1.5">
-            <div className="h-1 w-8 rounded bg-white/35" />
-            <div className="h-2 w-12 rounded bg-white/60" />
+        <div className="absolute inset-0 grid grid-cols-2 items-center gap-2 px-2.5">
+          <div className="space-y-1">
+            <div className="h-1 w-8 rounded bg-white/40" />
+            <div className="h-2 w-12 rounded bg-white/70" />
             <div className="h-1 w-14 rounded bg-white/25" />
           </div>
-          <div className="mx-auto size-9 rounded-full border-2 border-white/70" />
+          <div className="h-[68%] rounded-sm bg-[linear-gradient(120deg,#3a3a3a,#1a1a1a)] shadow-sm ring-1 ring-white/20" />
         </div>
       ) : null}
+      {variant === "4" ? (
+        <>
+          <div className="absolute inset-0 bg-[#0a0a0a]" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative size-12 overflow-hidden rounded-full ring-2 ring-white/70">
+              <div className="absolute inset-0 bg-[linear-gradient(120deg,#3a3a3a,#1a1a1a)]" />
+              <div className="absolute inset-[3px] rounded-full border border-white/35" />
+            </div>
+          </div>
+          <div className="absolute inset-x-0 bottom-1.5 mx-auto w-[42%] space-y-1">
+            <div className="mx-auto h-1 w-10 rounded bg-white/40" />
+            <div className="mx-auto h-1.5 w-14 rounded bg-white/70" />
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+function HeroAlignPreview({
+  align,
+  active,
+}: {
+  align: HeroAlign;
+  active: boolean;
+}) {
+  const frame = active ? "border-white/35" : "border-line";
+  const isCenter = align === "center";
+  return (
+    <div
+      className={`relative aspect-[16/10] overflow-hidden rounded-lg border bg-canvas ${frame}`}
+      aria-hidden
+    >
+      <div
+        className={`absolute inset-0 flex flex-col justify-center gap-1 px-3 ${
+          isCenter ? "items-center" : "items-start"
+        }`}
+      >
+        <div className={`h-1 rounded bg-white/40 ${isCenter ? "w-10" : "w-8"}`} />
+        <div className={`h-2 rounded bg-white/70 ${isCenter ? "w-16" : "w-14"}`} />
+        <div className={`h-1 rounded bg-white/25 ${isCenter ? "w-20" : "w-16"}`} />
+        <div className={`mt-1 flex gap-1 ${isCenter ? "" : ""}`}>
+          <div className="h-2 w-8 rounded-full bg-white/80" />
+          <div className="h-2 w-8 rounded-full border border-white/40" />
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { DottedWordmark } from "@/components/landing/dotted-wordmark";
 
 interface CircleMarkProps {
@@ -5,6 +6,8 @@ interface CircleMarkProps {
   subtitle?: string;
   sizePx?: number;
   className?: string;
+  /** Imagem circular por trás dos anéis (ex.: cartão na versão 4). */
+  backdropSrc?: string;
 }
 
 /** Anel externo estático + anel tracejado em rotação contínua. */
@@ -61,18 +64,35 @@ export function CircleMark({
   subtitle,
   sizePx = 380,
   className = "",
+  backdropSrc,
 }: CircleMarkProps) {
+  const maxCap = backdropSrc ? 480 : 420;
+
   return (
     <div
       className={`circle-mark relative mx-auto flex items-center justify-center ${className}`.trim()}
       style={{
         width: sizePx,
         height: sizePx,
-        maxWidth: "min(86vw, 420px)",
-        maxHeight: "min(86vw, 420px)",
+        maxWidth: `min(86vw, ${maxCap}px)`,
+        maxHeight: `min(86vw, ${maxCap}px)`,
       }}
     >
       <div className="absolute inset-0" aria-hidden>
+        {backdropSrc ? (
+          <div className="absolute inset-[6px] overflow-hidden rounded-full">
+            <Image
+              src={backdropSrc}
+              alt=""
+              fill
+              sizes="420px"
+              quality={90}
+              priority
+              className="object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-black/68" />
+          </div>
+        ) : null}
         <div className="circle-mark-ring-outer absolute inset-0 rounded-full" />
         <div className="circle-mark-ring-inner absolute inset-[18px] rounded-full" />
         <div className="absolute inset-[74px]">
@@ -80,16 +100,23 @@ export function CircleMark({
         </div>
       </div>
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center">
         {lines.map((line) => (
           <DottedWordmark
             key={line}
             text={line}
+            variant={backdropSrc ? "letter" : "default"}
             className="font-display text-[clamp(1rem,4.6vw,1.45rem)] leading-[1.5] font-semibold tracking-[0.2em]"
           />
         ))}
         {subtitle ? (
-          <span className="mt-3 text-[9px] tracking-[0.3em] text-ink-soft uppercase sm:text-[10px]">
+          <span
+            className={
+              backdropSrc
+                ? "mt-3 text-[9px] font-medium tracking-[0.3em] text-white uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.45)] sm:text-[10px]"
+                : "mt-3 text-[9px] tracking-[0.3em] text-ink-soft uppercase sm:text-[10px]"
+            }
+          >
             {subtitle}
           </span>
         ) : null}

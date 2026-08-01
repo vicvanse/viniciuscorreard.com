@@ -12,18 +12,35 @@
   "finalCtaLabel": "Agendar consulta pelo WhatsApp",
   "portraitSrc": "/brand/vinicius-portrait.webp",
   "portraitUpdatedAt": "",
-  "heroVariant": "1",
+  "heroVariant": "4",
+  "heroAlign": "center",
+  "showCircleMark": true,
   "nav": [
-    { "href": "#inicio", "label": "Início" },
-    { "href": "#sobre", "label": "Sobre mim" },
-    { "href": "#atendimento", "label": "Atendimento" },
-    { "href": "#duvidas", "label": "Dúvidas" },
-    { "href": "#contato", "label": "Contato" }
+    {
+      "href": "#inicio",
+      "label": "Início"
+    },
+    {
+      "href": "#sobre",
+      "label": "Sobre mim"
+    },
+    {
+      "href": "#atendimento",
+      "label": "Atendimento"
+    },
+    {
+      "href": "#duvidas",
+      "label": "Dúvidas"
+    },
+    {
+      "href": "#contato",
+      "label": "Contato"
+    }
   ],
   "hero": {
     "eyebrow": "Nutrição esportiva e clínica",
     "headline": "Nutrição que acompanha o seu ritmo",
-    "support": "Planos alimentares individualizados para performance, saúde e rotina real — sem dieta genérica e sem restrição desnecessária. Atendimento online e presencial.",
+    "support": "Planos alimentares individualizados para performance, saúde e rotina real, sem dieta genérica e sem restrição desnecessária. Atendimento online e presencial.",
     "cta": "Agende sua consulta",
     "circleSubtitle": "Nutricionista"
   },
@@ -45,14 +62,14 @@
       },
       {
         "title": "Precisa ajustar a alimentação por saúde",
-        "description": "Exames alterados, colesterol, glicemia, intestino ou pressão pedindo atenção. A mudança alimentar é parte central do tratamento — e, bem conduzida, não precisa ser radical nem tomar conta da sua vida."
+        "description": "Exames alterados, colesterol, glicemia, intestino ou pressão pedindo atenção. A mudança alimentar é parte central do tratamento e, bem conduzida, não precisa ser radical nem tomar conta da sua vida."
       }
     ]
   },
   "about": {
     "heading": "Um pouco sobre mim",
     "paragraphs": [
-      "Olá! Meu nome é Vinicius Correard e sou nutricionista, inscrito no CRN-10 sob o número 14710P, com atuação voltada à nutrição esportiva e ao acompanhamento clínico.",
+      "Olá! Meu nome é Vinicius Correard e sou nutricionista, formado pela Universidade Federal de Santa Catarina (UFSC), inscrito no CRN-10 sob o número 14710P, com atuação voltada à nutrição esportiva e ao acompanhamento clínico.",
       "Atendo pessoas em momentos bem diferentes: de quem busca performance e recomposição corporal a quem precisa reorganizar a alimentação por questões de saúde, ou simplesmente quer comer melhor sem transformar isso em mais um problema na agenda.",
       "Minha conduta parte de avaliação individual, evidência científica e ajustes progressivos. O objetivo não é entregar um plano perfeito no papel, e sim construir uma alimentação que você consiga sustentar depois que o acompanhamento terminar."
     ]
@@ -68,7 +85,7 @@
     "heading": "Como funciona o acompanhamento",
     "paragraphs": [
       "O plano alimentar é individualizado e considera seu objetivo, sua rotina, seu orçamento e os alimentos que você gosta. Trabalho com substituições e faixas de porção para que o plano funcione tanto nos dias organizados quanto nos dias corridos.",
-      "Nos retornos revisamos o que funcionou, ajustamos o que não funcionou e acompanhamos a evolução por medidas, exames e desempenho nos treinos — não apenas pelo número da balança."
+      "Nos retornos revisamos o que funcionou, ajustamos o que não funcionou e acompanhamos a evolução por medidas, exames e desempenho nos treinos, não apenas pelo número da balança."
     ],
     "facts": [
       {
@@ -94,7 +111,7 @@
       },
       {
         "question": "Como funciona o acompanhamento?",
-        "answer": "O primeiro contato é pelo WhatsApp, onde alinhamos horário e modalidade. Depois da avaliação inicial você recebe o plano alimentar e os materiais de apoio, e agendamos os retornos — em geral a cada 30 a 45 dias, conforme o objetivo."
+        "answer": "O primeiro contato é pelo WhatsApp, onde alinhamos horário e modalidade. Depois da avaliação inicial você recebe o plano alimentar e os materiais de apoio, e agendamos os retornos, em geral a cada 30 a 45 dias, conforme o objetivo."
       },
       {
         "question": "O atendimento é online ou presencial?",
@@ -119,7 +136,7 @@
     "support": "Me chame no WhatsApp para conhecer o acompanhamento, tirar dúvidas e escolher o melhor horário para a primeira consulta."
   },
   "footer": {
-    "copyright": "Copyright © 2026 Vinicius Correard — Nutricionista"
+    "copyright": "Copyright © 2026 Vinicius Correard · Nutricionista"
   },
   "metadata": {
     "title": "Vinicius Correard | Nutricionista CRN-10/14710P",

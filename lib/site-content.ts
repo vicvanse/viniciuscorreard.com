@@ -20,10 +20,15 @@ export interface FaqItem {
   answer: string;
 }
 
-/** Layout do hero no desktop. Mobile permanece o círculo acima do nome. */
-export type HeroVariant = "1" | "2" | "3";
+/** Layout do hero no desktop. Mobile permanece o cartão emoldurado acima do texto. */
+export type HeroVariant = "1" | "2" | "3" | "4";
 
-export const HERO_VARIANTS: HeroVariant[] = ["1", "2", "3"];
+export const HERO_VARIANTS: HeroVariant[] = ["1", "2", "3", "4"];
+
+/** Alinhamento do texto do hero no desktop. */
+export type HeroAlign = "left" | "center";
+
+export const HERO_ALIGNS: HeroAlign[] = ["left", "center"];
 
 export interface SiteContent {
   name: string;
@@ -40,8 +45,12 @@ export interface SiteContent {
   /** Foto do quadro Sobre mim. Vazio exibe a marca circular no lugar. */
   portraitSrc: string;
   portraitUpdatedAt: string;
-  /** Layout do hero no computador: 1 círculo centralizado, 2 empilhado, 3 lado a lado. */
+  /** Layout do hero no computador: 1 full-bleed, 2 quadro, 3 lado a lado, 4 círculo com fundo. */
   heroVariant: HeroVariant;
+  /** Alinhamento do bloco de texto do hero no desktop. */
+  heroAlign: HeroAlign;
+  /** Exibe o círculo animado (marca) no hero, em desktop e mobile. */
+  showCircleMark: boolean;
   nav: NavItem[];
   hero: {
     eyebrow: string;
@@ -111,6 +120,8 @@ export function createDefaultContent(): SiteContent {
     portraitSrc: "/brand/vinicius-portrait.webp",
     portraitUpdatedAt: "",
     heroVariant: "1",
+    heroAlign: "left",
+    showCircleMark: true,
     nav: [
       { href: "#inicio", label: "Início" },
       { href: "#sobre", label: "Sobre mim" },
@@ -122,7 +133,7 @@ export function createDefaultContent(): SiteContent {
       eyebrow: "Nutrição esportiva e clínica",
       headline: "Nutrição que acompanha o seu ritmo",
       support:
-        "Planos alimentares individualizados para performance, saúde e rotina real — sem dieta genérica e sem restrição desnecessária. Atendimento online e presencial.",
+        "Planos alimentares individualizados para performance, saúde e rotina real, sem dieta genérica e sem restrição desnecessária. Atendimento online e presencial.",
       cta: "Agende sua consulta",
       circleSubtitle: "Nutricionista",
     },
@@ -149,14 +160,14 @@ export function createDefaultContent(): SiteContent {
         {
           title: "Precisa ajustar a alimentação por saúde",
           description:
-            "Exames alterados, colesterol, glicemia, intestino ou pressão pedindo atenção. A mudança alimentar é parte central do tratamento — e, bem conduzida, não precisa ser radical nem tomar conta da sua vida.",
+            "Exames alterados, colesterol, glicemia, intestino ou pressão pedindo atenção. A mudança alimentar é parte central do tratamento e, bem conduzida, não precisa ser radical nem tomar conta da sua vida.",
         },
       ],
     },
     about: {
       heading: "Um pouco sobre mim",
       paragraphs: [
-        "Olá! Meu nome é Vinicius Correard e sou nutricionista, inscrito no CRN-10 sob o número 14710P, com atuação voltada à nutrição esportiva e ao acompanhamento clínico.",
+        "Olá! Meu nome é Vinicius Correard e sou nutricionista, formado pela Universidade Federal de Santa Catarina (UFSC), inscrito no CRN-10 sob o número 14710P, com atuação voltada à nutrição esportiva e ao acompanhamento clínico.",
         "Atendo pessoas em momentos bem diferentes: de quem busca performance e recomposição corporal a quem precisa reorganizar a alimentação por questões de saúde, ou simplesmente quer comer melhor sem transformar isso em mais um problema na agenda.",
         "Minha conduta parte de avaliação individual, evidência científica e ajustes progressivos. O objetivo não é entregar um plano perfeito no papel, e sim construir uma alimentação que você consiga sustentar depois que o acompanhamento terminar.",
       ],
@@ -172,7 +183,7 @@ export function createDefaultContent(): SiteContent {
       heading: "Como funciona o acompanhamento",
       paragraphs: [
         "O plano alimentar é individualizado e considera seu objetivo, sua rotina, seu orçamento e os alimentos que você gosta. Trabalho com substituições e faixas de porção para que o plano funcione tanto nos dias organizados quanto nos dias corridos.",
-        "Nos retornos revisamos o que funcionou, ajustamos o que não funcionou e acompanhamos a evolução por medidas, exames e desempenho nos treinos — não apenas pelo número da balança.",
+        "Nos retornos revisamos o que funcionou, ajustamos o que não funcionou e acompanhamos a evolução por medidas, exames e desempenho nos treinos, não apenas pelo número da balança.",
       ],
       facts: [
         {
@@ -203,7 +214,7 @@ export function createDefaultContent(): SiteContent {
         {
           question: "Como funciona o acompanhamento?",
           answer:
-            "O primeiro contato é pelo WhatsApp, onde alinhamos horário e modalidade. Depois da avaliação inicial você recebe o plano alimentar e os materiais de apoio, e agendamos os retornos — em geral a cada 30 a 45 dias, conforme o objetivo.",
+            "O primeiro contato é pelo WhatsApp, onde alinhamos horário e modalidade. Depois da avaliação inicial você recebe o plano alimentar e os materiais de apoio, e agendamos os retornos, em geral a cada 30 a 45 dias, conforme o objetivo.",
         },
         {
           question: "O atendimento é online ou presencial?",
@@ -233,7 +244,7 @@ export function createDefaultContent(): SiteContent {
         "Me chame no WhatsApp para conhecer o acompanhamento, tirar dúvidas e escolher o melhor horário para a primeira consulta.",
     },
     footer: {
-      copyright: `Copyright © ${year} Vinicius Correard — Nutricionista`,
+      copyright: `Copyright © ${year} Vinicius Correard · Nutricionista`,
     },
     metadata: {
       title: "Vinicius Correard | Nutricionista CRN-10/14710P",
@@ -335,6 +346,11 @@ export function sanitizeContent(input: unknown): SiteContent {
   );
   merged.portraitUpdatedAt = String(raw.portraitUpdatedAt ?? defaults.portraitUpdatedAt);
   merged.heroVariant = sanitizeHeroVariant(raw.heroVariant);
+  merged.heroAlign = sanitizeHeroAlign(raw.heroAlign);
+  merged.showCircleMark =
+    typeof raw.showCircleMark === "boolean"
+      ? raw.showCircleMark
+      : defaults.showCircleMark;
 
   return merged;
 }
@@ -348,8 +364,13 @@ export function circleMarkLines(name: string): string[] {
 }
 
 function sanitizeHeroVariant(value: unknown): HeroVariant {
-  if (value === "1" || value === "2" || value === "3") return value;
+  if (value === "1" || value === "2" || value === "3" || value === "4") return value;
   return "1";
+}
+
+function sanitizeHeroAlign(value: unknown): HeroAlign {
+  if (value === "left" || value === "center") return value;
+  return "left";
 }
 
 function sanitizeInstagramUrl(value: string): string {

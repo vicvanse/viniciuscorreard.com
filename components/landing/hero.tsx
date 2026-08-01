@@ -3,7 +3,12 @@
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { CircleMark } from "@/components/landing/circle-mark";
-import { circleMarkLines, type HeroVariant, type SiteContent } from "@/lib/site-content";
+import {
+  circleMarkLines,
+  type HeroAlign,
+  type HeroVariant,
+  type SiteContent,
+} from "@/lib/site-content";
 
 interface HeroProps {
   content: SiteContent;
@@ -15,30 +20,45 @@ const HERO_CARD_FRAMED_SRC = "/brand/business-card.webp";
 function HeroCopy({
   content,
   centered = false,
+  supportBackdrop = false,
 }: {
   content: SiteContent;
   centered?: boolean;
+  /** Fundo preto atrás do texto de apoio (full-bleed). */
+  supportBackdrop?: boolean;
 }) {
   return (
-    <>
-      <p className="text-[0.7rem] font-medium tracking-[0.22em] text-muted uppercase sm:text-xs">
+    <div className={centered ? "text-center" : "text-left"}>
+      <p className="mb-3 text-[0.7rem] font-medium tracking-[0.22em] text-muted uppercase sm:mb-4 sm:text-xs">
         {content.hero.eyebrow}
       </p>
-      <h1 className="font-display mt-4 text-[clamp(2.1rem,7.5vw,3.75rem)] leading-[1.04] font-semibold tracking-tight text-ink">
+      <h1 className="font-display text-[clamp(2.1rem,7.5vw,3.75rem)] leading-[1.04] font-semibold tracking-tight text-ink">
         {content.hero.headline}
       </h1>
-      <p
-        className={`mt-5 text-[0.95rem] leading-relaxed text-ink-soft sm:text-lg ${
-          centered ? "mx-auto max-w-xl" : "max-w-xl"
-        }`}
-      >
-        {content.hero.support}
-      </p>
+      {supportBackdrop ? (
+        <p
+          className={`mt-5 rounded-2xl bg-black/85 px-5 py-4 text-[0.95rem] leading-relaxed text-ink-soft ring-1 ring-white/10 backdrop-blur-sm sm:text-lg ${
+            centered ? "mx-auto max-w-xl" : "max-w-md"
+          }`}
+        >
+          {content.hero.support}
+        </p>
+      ) : (
+        <p
+          className={`mt-5 text-[0.95rem] leading-relaxed text-ink-soft sm:text-lg ${
+            centered ? "mx-auto max-w-xl" : "max-w-md"
+          }`}
+        >
+          {content.hero.support}
+        </p>
+      )}
       <p className="mt-4 text-sm text-muted">
         {content.name} · {content.title} · {content.crn}
       </p>
       <div
-        className={`mt-8 flex flex-col gap-3 sm:flex-row ${centered ? "sm:justify-center" : ""}`}
+        className={`mt-8 flex flex-col gap-3 sm:flex-row ${
+          centered ? "sm:justify-center" : ""
+        }`}
       >
         <a
           href={content.whatsappUrl}
@@ -55,7 +75,7 @@ function HeroCopy({
           Como funciona
         </a>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -68,18 +88,20 @@ function FramedCard({
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-[1.1rem] border border-white/12 bg-canvas shadow-[0_24px_60px_rgba(0,0,0,0.55)] ${className ?? ""}`}
+      className={`overflow-hidden rounded-[1.1rem] border border-white/12 bg-canvas p-2 shadow-[0_24px_60px_rgba(0,0,0,0.55)] ${className ?? ""}`}
     >
-      <Image
-        src={HERO_CARD_FRAMED_SRC}
-        alt="Identidade visual Vinicius Correard"
-        width={1024}
-        height={662}
-        priority
-        quality={90}
-        sizes={sizes}
-        className="h-auto w-full"
-      />
+      <div className="overflow-hidden rounded-[0.8rem]">
+        <Image
+          src={HERO_CARD_FRAMED_SRC}
+          alt="Identidade visual Vinicius Correard"
+          width={1024}
+          height={662}
+          priority
+          quality={90}
+          sizes={sizes}
+          className="h-auto w-full"
+        />
+      </div>
     </div>
   );
 }
@@ -91,7 +113,7 @@ function FullBleedCardBackdrop({ reduceMotion }: { reduceMotion: boolean | null 
         className="absolute inset-0"
         initial={reduceMotion ? false : { opacity: 0.7 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
         <Image
           src={HERO_CARD_SRC}
@@ -104,11 +126,11 @@ function FullBleedCardBackdrop({ reduceMotion }: { reduceMotion: boolean | null 
         />
       </motion.div>
       <div
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,10,0.72)_0%,rgba(10,10,10,0.55)_38%,rgba(10,10,10,0.88)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,rgba(10,10,10,0.88)_0%,rgba(10,10,10,0.72)_28%,rgba(10,10,10,0.4)_52%,rgba(10,10,10,0.55)_100%)]"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0a0a0a] to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#0a0a0a]/80 to-transparent"
         aria-hidden
       />
       <div
@@ -119,73 +141,117 @@ function FullBleedCardBackdrop({ reduceMotion }: { reduceMotion: boolean | null 
   );
 }
 
+function SoftAtmosphere() {
+  return <div className="atmosphere-deep absolute inset-0" aria-hidden />;
+}
+
 export function Hero({ content }: HeroProps) {
   const reduceMotion = useReducedMotion();
   const variant: HeroVariant = content.heroVariant ?? "1";
+  const align: HeroAlign = content.heroAlign ?? "left";
+  const isCentered = align === "center";
+  const showCircle = content.showCircleMark !== false;
   const lines = circleMarkLines(content.name);
-
-  const mark = (
-    <CircleMark
-      lines={lines}
-      subtitle={content.hero.circleSubtitle}
-      sizePx={380}
-    />
-  );
 
   return (
     <section
       id="inicio"
       className="relative isolate min-h-[100svh] overflow-hidden bg-canvas"
     >
-      {/* Celular: cartão + círculo + texto */}
+      {/* Mobile: quadro do cartão acima do texto (como no Pedro) */}
       <div className="sm:hidden">
-        <div className="atmosphere-deep absolute inset-0" aria-hidden />
+        <SoftAtmosphere />
         <div className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-5 pt-24 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           <motion.div
-            className="w-full"
+            className="w-full max-w-xl"
             initial={reduceMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
           >
-            <figure className="mb-8">
-              <FramedCard sizes="320px" className="mx-auto max-w-[20rem]" />
+            <figure className="mb-6">
+              <FramedCard sizes="320px" className="mx-auto max-w-[19.5rem]" />
             </figure>
-            <div className="mb-8">
-              <CircleMark
-                lines={lines}
-                subtitle={content.hero.circleSubtitle}
-                sizePx={280}
-              />
-            </div>
+            {showCircle ? (
+              <div className="mb-8 flex justify-center">
+                <CircleMark
+                  lines={lines}
+                  subtitle={content.hero.circleSubtitle}
+                  sizePx={240}
+                />
+              </div>
+            ) : null}
             <HeroCopy content={content} />
           </motion.div>
         </div>
       </div>
 
-      {/* Desktop */}
+      {/* Desktop: 4 variantes do cartão + alinhamento esquerda/centro */}
       <div className="hidden sm:block">
         {variant === "1" ? (
           <>
             <FullBleedCardBackdrop reduceMotion={reduceMotion} />
-            <div className="relative mx-auto flex min-h-[100svh] max-w-4xl flex-col items-center justify-center px-8 pt-32 pb-24 text-center">
+            <div
+              className={`relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-8 pt-28 pb-20 lg:justify-center lg:pt-24 lg:pb-24 ${
+                isCentered ? "items-center" : "items-start"
+              }`}
+            >
               <motion.div
-                initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {mark}
-              </motion.div>
-              <motion.div
-                className="mt-12 w-full"
+                className={`w-full max-w-xl ${isCentered ? "text-center" : ""}`}
                 initial={reduceMotion ? false : { opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.75,
-                  delay: 0.12,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
+                transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
               >
-                <HeroCopy content={content} centered />
+                {showCircle ? (
+                  <div className={`mb-8 ${isCentered ? "flex justify-center" : ""}`}>
+                    <CircleMark
+                      lines={lines}
+                      subtitle={content.hero.circleSubtitle}
+                      sizePx={280}
+                    />
+                  </div>
+                ) : null}
+                <HeroCopy
+                  content={content}
+                  centered={isCentered}
+                  supportBackdrop
+                />
+              </motion.div>
+            </div>
+          </>
+        ) : null}
+
+        {variant === "4" ? (
+          <>
+            <SoftAtmosphere />
+            <div
+              className={`relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-8 pt-28 pb-20 lg:justify-center lg:pt-24 lg:pb-24 ${
+                isCentered ? "items-center" : "items-start"
+              }`}
+            >
+              <motion.div
+                className={`w-full max-w-xl ${isCentered ? "text-center" : ""}`}
+                initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {showCircle ? (
+                  <div className={`mb-10 ${isCentered ? "flex justify-center" : ""}`}>
+                    <CircleMark
+                      lines={lines}
+                      subtitle={content.hero.circleSubtitle}
+                      sizePx={360}
+                      backdropSrc={HERO_CARD_FRAMED_SRC}
+                    />
+                  </div>
+                ) : (
+                  <figure className="mb-8">
+                    <FramedCard
+                      sizes="(max-width: 1024px) 70vw, 560px"
+                      className={`max-w-[34rem] ${isCentered ? "mx-auto" : ""}`}
+                    />
+                  </figure>
+                )}
+                <HeroCopy content={content} centered={isCentered} />
               </motion.div>
             </div>
           </>
@@ -193,22 +259,23 @@ export function Hero({ content }: HeroProps) {
 
         {variant === "2" ? (
           <>
-            <div className="atmosphere-deep absolute inset-0" aria-hidden />
-            <div className="relative mx-auto flex min-h-[100svh] max-w-3xl flex-col justify-center px-8 pt-32 pb-24">
+            <SoftAtmosphere />
+            <div className="relative mx-auto flex min-h-[100svh] max-w-3xl flex-col justify-center px-8 pt-28 pb-20">
               <motion.div
-                className="w-full"
+                className={`mx-auto w-full max-w-xl ${
+                  isCentered ? "text-center" : "text-left"
+                }`}
                 initial={reduceMotion ? false : { opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
               >
-                <figure className="mb-10">
+                <figure className="mb-8">
                   <FramedCard
                     sizes="(max-width: 1024px) 70vw, 560px"
                     className="mx-auto max-w-[34rem]"
                   />
                 </figure>
-                <div className="mb-10">{mark}</div>
-                <HeroCopy content={content} />
+                <HeroCopy content={content} centered={isCentered} />
               </motion.div>
             </div>
           </>
@@ -216,17 +283,22 @@ export function Hero({ content }: HeroProps) {
 
         {variant === "3" ? (
           <>
-            <div className="atmosphere-deep absolute inset-0" aria-hidden />
-            <div className="relative mx-auto grid min-h-[100svh] max-w-6xl items-center gap-12 px-8 pt-32 pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-14">
+            <SoftAtmosphere />
+            <div
+              className="pointer-events-none absolute inset-y-0 right-0 hidden w-[52%] bg-[radial-gradient(ellipse_at_70%_40%,rgba(255,255,255,0.06),transparent_65%)] lg:block"
+              aria-hidden
+            />
+            <div className="relative mx-auto grid min-h-[100svh] max-w-6xl items-center gap-10 px-8 pt-28 pb-20 md:grid-cols-2 md:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14 lg:pt-24 lg:pb-24">
               <motion.div
+                className="w-full max-w-xl"
                 initial={reduceMotion ? false : { opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
               >
-                <HeroCopy content={content} />
+                <HeroCopy content={content} centered={isCentered} />
               </motion.div>
-              <motion.div
-                className="flex flex-col items-center gap-10"
+              <motion.figure
+                className="w-full"
                 initial={reduceMotion ? false : { opacity: 0, x: 24 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{
@@ -235,9 +307,8 @@ export function Hero({ content }: HeroProps) {
                   ease: [0.22, 1, 0.36, 1],
                 }}
               >
-                <FramedCard sizes="(max-width: 1024px) 80vw, 520px" />
-                <div className="hidden lg:block">{mark}</div>
-              </motion.div>
+                <FramedCard sizes="(max-width: 1024px) 80vw, 560px" />
+              </motion.figure>
             </div>
           </>
         ) : null}

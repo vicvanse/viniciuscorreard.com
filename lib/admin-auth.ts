@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual, randomBytes } from "crypto";
 import { cookies } from "next/headers";
 
-export const ADMIN_COOKIE = "pc_admin_session";
+export const ADMIN_COOKIE = "vc_admin_session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 8; // 8h
 
 interface SessionPayload {

@@ -19,7 +19,7 @@ export function About({ content }: AboutProps) {
       className="atmosphere relative overflow-hidden px-5 py-20 sm:px-8 sm:py-28"
       aria-labelledby="about-heading"
     >
-      <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center lg:gap-16">
+      <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,336px)] lg:items-start lg:gap-14 xl:grid-cols-[minmax(0,1fr)_minmax(0,368px)]">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -42,49 +42,58 @@ export function About({ content }: AboutProps) {
           </div>
         </motion.div>
 
-        <motion.div
-          className="relative overflow-hidden rounded-[1.5rem] border border-line bg-canvas"
-          initial={reduceMotion ? false : { opacity: 0, scale: 0.98 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7 }}
-        >
-          {portraitSrc ? (
-            <div className="grid gap-3 p-3 sm:p-4">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[1.1rem]">
+        <div className="mx-auto grid w-full max-w-sm grid-cols-1 gap-4 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:gap-3">
+          <motion.div
+            className="relative aspect-[4/5] overflow-hidden rounded-[1.25rem] border border-line bg-canvas shadow-[0_20px_50px_rgba(0,0,0,0.35)]"
+            initial={reduceMotion ? false : { opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.7 }}
+          >
+            {portraitSrc ? (
+              <>
                 <Image
                   src={portraitSrc}
-                  alt={`${name} — ${crn}`}
+                  alt={`${name}, ${crn}`}
                   fill
-                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  sizes="(max-width: 1024px) 100vw, 176px"
                   className="object-cover object-[center_15%]"
                   key={`${portraitSrc}-${portraitUpdatedAt}`}
                 />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent p-6 sm:p-8">
-                  <p className="font-display text-2xl font-semibold text-ink">{name}</p>
-                  <p className="mt-1 text-sm text-ink-soft">{crn}</p>
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent p-5 sm:p-6 lg:p-3">
+                  <p className="font-display text-2xl font-semibold text-ink lg:text-base">
+                    {name}
+                  </p>
+                  <p className="mt-1 text-sm text-ink-soft lg:mt-0.5 lg:text-[11px]">{crn}</p>
+                </div>
+              </>
+            ) : (
+              <div className="flex h-full flex-col items-center justify-center gap-8 px-6 py-10 lg:gap-4 lg:px-3 lg:py-6">
+                <CircleMark lines={circleMarkLines(name)} subtitle={title} sizePx={200} />
+                <div className="text-center">
+                  <p className="font-display text-2xl font-semibold text-ink lg:text-base">{name}</p>
+                  <p className="mt-1 text-sm text-muted lg:text-xs">{crn}</p>
                 </div>
               </div>
-              <div className="relative aspect-[3/2] overflow-hidden rounded-[1.1rem]">
-                <Image
-                  src="/brand/vinicius-portrait-alt.webp"
-                  alt={`${name} na formatura em Nutrição`}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-cover object-[center_30%]"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="flex aspect-[4/5] flex-col items-center justify-center gap-10 px-6 py-10">
-              <CircleMark lines={circleMarkLines(name)} subtitle={title} sizePx={300} />
-              <div className="text-center">
-                <p className="font-display text-2xl font-semibold text-ink">{name}</p>
-                <p className="mt-1 text-sm text-muted">{crn}</p>
-              </div>
-            </div>
-          )}
-        </motion.div>
+            )}
+          </motion.div>
+
+          <motion.div
+            className="relative aspect-[4/5] overflow-hidden rounded-[1.25rem] border border-line bg-canvas shadow-[0_20px_50px_rgba(0,0,0,0.35)]"
+            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.65, delay: reduceMotion ? 0 : 0.08 }}
+          >
+            <Image
+              src="/brand/vinicius-gym.webp"
+              alt={`${name} em treino`}
+              fill
+              sizes="(max-width: 1024px) 100vw, 176px"
+              className="object-cover object-[center_20%]"
+            />
+          </motion.div>
+        </div>
       </div>
     </section>
   );
